@@ -1,0 +1,110 @@
+---
+title: "Exploratory Data Analysis"
+author: "Andrew Billington"
+date: "13/11/2020"
+output:
+  html_document:
+    code_folding: hide
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+
+# Packages 
+require(here)
+source(here("/R/packages.r"))
+
+# Load Data 
+dat <- read.csv(file = here("/HRDataset.csv"),
+                stringsAsFactors = TRUE) %>% 
+  janitor::clean_names()
+
+# Summary Values
+count_col <- ncol(dat)
+count_row <- nrow(dat)
+
+```
+
+Exploratory data analysis of NAME, containing **`r count_col`** columns and **`r count_row` rows**.
+
+# Strucutre 
+
+```{r}
+dat %>% 
+str_table() %>% 
+  dplyr::arrange(class) %>% 
+formattable::format_table()
+
+```
+
+# Data Quality
+
+## Missing Values 
+```{r}
+
+# vis_mis - missing data
+dat %>%
+  visdat::vis_miss(
+    sort_miss = TRUE
+    # ,cluster = TRUE
+  ) +
+  ggplot2::coord_flip()
+```
+
+## Data Types and Missing Values 
+
+```{r}
+
+# vis_dat - data types and missing
+dat %>%
+  visdat::visdat::vis_dat() +
+  ggplot2::coord_flip()
+
+```
+
+
+## Class of Values 
+
+```{r}
+# vis_guess - the individual class of each value in your data
+dat %>%
+  visdat::visdat::vis_guess() +
+  ggplot2::coord_flip()
+
+```
+
+
+# Count Unique Charcter Values 
+
+```{r}
+# dat %>% 
+#   dplyr::select_if(is_character) 
+
+```
+
+
+# Catergorical 
+
+```{r}
+
+dat %>% 
+  dplyr::select_if(is.factor) %>% View()
+
+```
+
+
+# Correlation 
+```{r}
+
+# vis_cor - correlation
+dat %>%
+  dplyr::select_if(is.numeric) %>%
+  # Select interesting numerics
+  dplyr::select(salary, engagement_survey, emp_satisfaction, special_projects_count, days_late_last30, absences) %>%
+  visdat::vis_cor()
+
+```
